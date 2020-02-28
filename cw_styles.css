@@ -57,6 +57,7 @@
 .map-overlay p.credit {
    margin: 0;
    padding: 0;
+
 }
 
 #features {
@@ -66,7 +67,7 @@
     height: 100px;
 }
 .mapboxgl-popup {
-   max-width: 400px;
+   max-width: 300px;
    min-width: 150px;
    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
    padding: 0;
@@ -105,7 +106,7 @@
 }
 
 #legend {
-    left: 0;
+    left: 30px;
     padding: 10px;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
     line-height: 18px;
@@ -135,7 +136,7 @@
     position: absolute;
     padding-top: 0px;
     right: 10px;
-    top: 150px;
+    top: 160px;
     width: 110px;
     background: white;
     height: 100px;
@@ -183,7 +184,8 @@
 .mapboxgl-ctrl-geocoder {
     min-width: 100%;
 }
-#chartContainer {width: 500px; margin: auto; margin-bottom: 50px; position:absolute; background:white;right: 10px;top: 390px;opacity: 0.8;}
+#chartContainer {width: 500px; margin: auto; margin-bottom: 20px; position:absolute; background:white;right: 10px;
+    top: 390px;opacity: 0.9;box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);}
 #chartContainer p {margin-left: 60px; margin-bottom: 5px; margin-top: 0; padding: 0;}
 #charttitle {font: bold 16px  Arial, sans-serif;}
 

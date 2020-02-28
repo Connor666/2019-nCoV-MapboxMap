@@ -53,25 +53,81 @@
                 <label id='date'>2020-01-19</label>
             </td>
         </tr></table>
-        <p class="credit">Novel Coronavirus Data: <a href="https://news.qq.com/zt2020/page/feiyan.htm">Tencent</a> and <a href="https://github.com/GuangchuangYu/nCov2019">Southern Medical University</a></p>
+        <p class="credit">Novel Coronavirus Data: <a href="https://news.qq.com/zt2020/page/feiyan.htm">Tencent</a> and <a href="https://github.com/GuangchuangYu/nCov2019">Southern Medical University</a>
+            Map Author: <a href="https://github.com/Connor666">Yu Fu</a> (CASA, University College London)</p>
     </div>
 </div>
 <div id="chartContainer">
 
     <p id="charttitle">Chart title is here</p>
-    <p id="chartsubhead">Novel Coronavirus Daily</p>
+    <p id="chartsubhead" style="font-size: 15px">Novel Coronavirus Daily</p>
 
 </div>
 <script>
-    d3.csv("data.csv", function(CityData) {
+    function JSONObject(type,Date,People){
+        this.type=type;
+        this.Date=Date;
+        this.People=People;
+    }
 
-        var CityDataIndex = 0;
-        console.log(CityData[0]);
-        document.getElementById("charttitle").innerHTML = CityData[CityDataIndex].province; // The name of the city and country is inserted into the chart title
-        var svg = dimple.newSvg("#chartContainer", 840, 440); // The chart is an svg variable assigned to the chartcontainer div. It's width and height are also assigned here
 
-    })
+    function chartSet(index){
+        d3.csv("data.csv", function(CovData) {
 
+            var DataIndex = index-1;
+            console.log(CovData);
+            document.getElementById("charttitle").innerHTML = CovData[DataIndex].province; // The name of the city and country is inserted into the chart title
+            console.log(document.getElementById("chartContainer"))
+            var svg = dimple.newSvg("#chartContainer", 500, 250); // The chart is an svg variable assigned to the chartcontainer div. It's width and height are also assigned here
+            var chartdata =[]
+            for (var key in CovData[DataIndex]){
+                if (key.match(RegExp(/confirm/))){
+                    chartdata.push(new JSONObject("Confirm",key.replace("_confirm",""),CovData[DataIndex][key]))
+            }
+                else if (key.match(RegExp(/heal/))){
+                    chartdata.push(new JSONObject("Heal",key.replace("_heal",""),CovData[DataIndex][key]))
+                }
+
+                else if(key.match(RegExp(/dead/))){
+                    chartdata.push(new JSONObject("Death",key.replace("_dead",""),CovData[DataIndex][key]))
+                }
+            }
+
+            console.log(chartdata)
+            var myChart = new dimple.chart(svg, chartdata);
+            myChart.setBounds(60, 15, 390, 200);            // Set the chart bounds within the svg container
+
+            myChart.defaultColors = [
+                new dimple.color("#fc4e2a"),
+                new dimple.color("#31a354"),
+                new dimple.color("#3182bd")
+            ];
+
+            myChart.addLegend(100, 0, 380, 200, "right");
+
+            var x = myChart.addTimeAxis("x", "Date","%m-%d","%m-%d");  // Define the x axis. The latter statements define the date format which we want to be year only
+            x.timeInterval = 1;
+
+
+            var y = myChart.addMeasureAxis("y", "People"); // Define the y axis
+            y.ticks = 6;
+
+            var s = myChart.addSeries("type", dimple.plot.bar);
+            s.interpolation = "cardinal";
+
+            myChart.draw(1600);
+
+
+            svg.selectAll("path.dimple-proj").style("stroke", "2"); // Some minor stying changes using the svg selectAll statement. Make the projected data a dashed line and the grid colour lighter.
+            svg.selectAll("path.domain").style("stroke", "#CCC");
+            svg.selectAll("g.tick line").style("stroke", "#CCC");
+
+
+
+        })
+    }
+
+    chartSet(35)
     mapboxgl.accessToken = 'pk.eyJ1IjoiY29ubm9yNjY2IiwiYSI6ImNrNWk1aDEwbDA4MWgzbW5wZGJocGpscW4ifQ.OixjWYY1xhduPq7A8swzPw'; // Put your Mapbox Public Access token here
 
     // Load a new map in the 'map' HTML div
@@ -240,7 +296,7 @@
 
 
 
-        var mypopup = new mapboxgl.Popup({offset:[150,50],closeButton: false});
+        var mypopup = new mapboxgl.Popup({offset:[120,50],closeButton: false});
 
 /*
         map.on('mouseover', 'Province', function (e) {
@@ -289,9 +345,9 @@
             if (la.length==1) {
 
                 map.setFilter('lahighlight', ['==','NAME',la[0].properties.NAME]);
-                console.log(la[0].properties.NAME);
+                //console.log(la[0].properties.NAME);
                 document.getElementById('laname').innerHTML = la[0].properties.NAME;
-                console.log(la);
+                //console.log(la);
                 var confirm = map.getPaintProperty('Province','fill-color')[1][1].substr(0,7)+'c'
                 var heal=map.getPaintProperty('Province','fill-color')[1][1].substr(0,7)+'h'
                 var dead=map.getPaintProperty('Province','fill-color')[1][1].substr(0,7)+'d'
@@ -305,6 +361,26 @@
                 map.setFilter('lahighlight', ['==','NAME','null']);
                 console.log('No features');
                 document.getElementById('laname').innerHTML = "Novel Coronavirus Daily";
+            }
+
+        });
+
+        map.on('click', function (e) {
+            var la = map.queryRenderedFeatures(e.point, {
+                layers: ['Province']
+            });
+            if (la.length==1){
+                var ID=la[0].id;
+                var chartEle=document.getElementById("chartContainer");
+
+                chartEle.children[2].remove();
+                chartSet(ID)
+
+
+            } else{
+                var chartEle=document.getElementById("chartContainer");
+                chartEle.children[2].remove();
+                chartSet(35);
             }
 
         });
