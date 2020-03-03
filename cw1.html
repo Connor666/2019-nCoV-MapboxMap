@@ -7,7 +7,6 @@
     <script src="https://api.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css" rel="stylesheet" />
     <link href='cw_styles.css' rel='stylesheet' />
-    <script src="../../programming/Assessment_Final_for_Students/finalAssessmentCASA0O13.js"></script>
 </head>
 <body>
 <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.4.2/mapbox-gl-geocoder.min.js"></script>
@@ -145,7 +144,7 @@
         accessToken: mapboxgl.accessToken,
         mapboxgl: mapboxgl,
         countries:'CN,HK,MO,TW',
-        placeholder:'Search for China provinces ',
+        placeholder:'Search for China provinces',
         language:'EN',
         collapsed:Boolean(true),
         clearAndBlurOnEsc:Boolean(true),
@@ -173,6 +172,33 @@
                 'get',
                 'name_' + language
             ]);
+            var label=document.getElementById("filters");
+            var currentLegend=document.getElementById('legend');
+            if (language=="zh-Hans"){
+                label.children[1].innerHTML='确诊';
+                label.children[3].innerHTML='康复';
+                label.children[5].innerHTML='死亡';
+                document.getElementById("layerControl").children[0].innerHTML='图例';
+                for (var i=0; i< label.children.length;i++)
+                    if (label.children[i].checked==true){
+                        console.log(label.children[i+1].innerHTML);
+                        currentLegend.childNodes[0].textContent=label.children[i+1].innerHTML
+                    }
+                geocoder.setPlaceholder('查找省或城市名字')
+            }
+            else {
+                label.children[1].innerHTML='Confirm';
+                label.children[3].innerHTML='Heal';
+                label.children[5].innerHTML='Death';
+                document.getElementById("layerControl").children[0].innerHTML='Layer';
+                for (var i=0; i< label.children.length;i++)
+                    if (label.children[i].checked==true){
+                        console.log(label.children[i+1].innerHTML);
+                        currentLegend.childNodes[0].textContent=label.children[i+1].innerHTML
+                    }
+                geocoder.setPlaceholder('Search for China provinces')
+            }
+
         });
 
 
@@ -242,7 +268,8 @@
                 [pp[2],pp[3],pp[4],pp[5],pp[6],pp[7],pp[8],pp[9],pp[10],pp[11],pp[12]] = ["#ffeda0",10,"#fed976",100,"#feb24c",500,"#fc4e2a",1000,"#e31a1c",10000,"#bd0026"];
                 map.setPaintProperty('Province','fill-color',pp);
                 var currentLegend=document.getElementById('legend');
-                currentLegend.childNodes[0].textContent='Confirm';
+                var currentLayer=document.getElementById('filters');
+                currentLegend.childNodes[0].textContent=currentLayer.children[1].innerHTML;
                 removeLayer(currentLegend);
                 setLegend(['0-10', '10-100','100-500', '500-1000', '1000-10000', '10000+'],["#ffeda0","#fed976","#feb24c","#fc4e2a","#e31a1c","#bd0026"]);
             }
@@ -250,7 +277,8 @@
                 pp[1][1] = pp[1][1].substr(0,7)+'h';
                 [pp[2],pp[3],pp[4],pp[5],pp[6],pp[7],pp[8],pp[9],pp[10],pp[11],pp[12]] = ["#ffffcc",10,"#c2e699",100,"#78c679",500,"#31a354",1000,"#006837",1001,"#006837"];
                 var currentLegend=document.getElementById('legend');
-                currentLegend.childNodes[0].textContent='Heal';
+                var currentLayer=document.getElementById('filters');
+                currentLegend.childNodes[0].textContent=currentLayer.children[3].innerHTML;
                 removeLayer(currentLegend);
                 setLegend(['0-10','10-100','100-500','500-1000','1000+'],["#ffffcc","#c2e699","#78c679","#31a354","#006837"]);
                 map.setPaintProperty('Province','fill-color',pp);
@@ -259,7 +287,8 @@
                 pp[1][1] = pp[1][1].substr(0,7)+'d';
                 [pp[2],pp[3],pp[4],pp[5],pp[6],pp[7],pp[8],pp[9],pp[10],pp[11],pp[12]] = ["#eff3ff",1,"#bdd7e7",5,"#6baed6",10,"#3182bd",100,"#08519c",101,"#08519c"];
                 var currentLegend=document.getElementById('legend');
-                currentLegend.childNodes[0].textContent='Death';
+                var currentLayer=document.getElementById('filters');
+                currentLegend.childNodes[0].textContent=currentLayer.children[5].innerHTML;
                 removeLayer(currentLegend);
                 setLegend(['0-1','1-5','5-10','10-100','100+'],["#eff3ff","#bdd7e7","#6baed6","#3182bd","#08519c"]);
                 map.setPaintProperty('Province','fill-color',pp);
@@ -345,6 +374,7 @@
                 setDate(date,layer);
             });
         });
+        //TODO : 优化slider 和 filters
 
 /*        document.getElementById('slider','filters').addEventListener('input', function(e) {
             var date = parseInt(e.target.value);

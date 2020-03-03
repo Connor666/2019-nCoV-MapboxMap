@@ -184,6 +184,31 @@
 .mapboxgl-ctrl-geocoder {
     min-width: 100%;
 }
+#buttons {
+    width: 50%;
+    margin: 0 auto;
+    position: absolute;
+    left: -8px;
+
+}
+.button {
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+    width: 15%;
+    padding: 8px;
+    border-radius: 3px;
+    margin-top: 10px;
+    font-size: 12px;
+    text-align: center;
+    color: #fff;
+    background: #feb24c;
+    font-family: sans-serif;
+    font-weight: bold;
+    left: 0px;
+    top: 50px;
+}
+
 #chartContainer {width: 500px; margin: auto; margin-bottom: 20px; position:absolute; background:white;right: 10px;
     top: 390px;opacity: 0.9;box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);}
 #chartContainer p {margin-left: 60px; margin-bottom: 5px; margin-top: 0; padding: 0;}
