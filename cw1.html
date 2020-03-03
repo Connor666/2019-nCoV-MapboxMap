@@ -57,6 +57,11 @@
             Map Author: <a href="https://github.com/Connor666">Yu Fu</a> (CASA, University College London)</p>
     </div>
 </div>
+<ul id="buttons">
+    <li id="button-zh-Hans" class="button">中文</li>
+    <li id="button-en" class="button">English</li>
+</ul>
+
 <div id="chartContainer">
 
     <p id="charttitle">Chart title is here</p>
@@ -122,8 +127,6 @@
             svg.selectAll("path.domain").style("stroke", "#CCC");
             svg.selectAll("g.tick line").style("stroke", "#CCC");
 
-
-
         })
     }
 
@@ -150,6 +153,28 @@
         types:'region,place'
     });
     document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
+    document
+        .getElementById('buttons')
+        .addEventListener('click', function(event) {
+            var language = event.target.id.substr('button-'.length);
+            map.setLayoutProperty('country-label', 'text-field', [
+                'get',
+                'name_' + language
+            ]);
+            map.setLayoutProperty('state-label', 'text-field', [
+                'get',
+                'name_' + language
+            ]);
+            map.setLayoutProperty('settlement-major-label', 'text-field', [
+                'get',
+                'name_' + language
+            ]);
+            map.setLayoutProperty('settlement-minor-label', 'text-field', [
+                'get',
+                'name_' + language
+            ]);
+        });
+
 
     var dates=['2020-01-19',
         '2020-01-20','2020-01-21','2020-01-22','2020-01-23','2020-01-24','2020-01-25','2020-01-26','2020-01-27','2020-01-28','2020-01-29',
