@@ -12,28 +12,34 @@
 <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.4.2/mapbox-gl-geocoder.min.js"></script>
 <script charset="utf-8" src="https://d3js.org/d3.v4.min.js"></script>
 <script charset="utf-8" src="https://cdnjs.cloudflare.com/ajax/libs/dimple/2.3.0/dimple.latest.min.js"></script>
+<script src="JS/D3Chart.js"></script>
+<script src="JS/playButton.js"></script>
 <link
         rel="stylesheet"
         href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.4.2/mapbox-gl-geocoder.css"
         type="text/css"
 />
 <div id='map'></div>
+<div class="map-overlay" id="title"><h5>COVID-19 in China by provinces (cases)</h5></div>
 <div id="geocoder" class="geocoder"></div>
-<div class="map-overlay" id='legend'><h5>Confirm</h5></div>
+<div class="map-overlay" id='legend'><h5>Confirmed</h5></div>
 <div class="map-overlay" id="layerControl">
     <h3>Layer</h3>
     <div class='row' id='filters'>
         <input id='Confirm' type='radio' name='layer' value='Confirm' checked='checked'>
-        <label for='Confirm'>Confirm</label>
+        <label for='Confirm'>Confirmed</label>
         <input id='Heal' type='radio' name='layer' value='Heal'>
-        <label for='Heal'>Heal</label>
+        <label for='Heal'>Recovered</label>
         <input id='Death' type='radio' name='layer' value='Death'>
-        <label for='Death'>Death</label>
+        <label for='Death'>Deaths</label>
     </div>
 </div>
 <div class='map-overlay' id="features">
     <div class='map-overlay-inner'>
         <h2 id="laname">Novel Coronavirus Daily</h2>
+        <div><button class="triangle-down" onclick="minusDate()"></button></div>
+        <div><button class="play" onclick="autoPlay()" id="autoPlay"></button></div>
+        <div><button class="triangle-up" onclick="addDate()"></button></div>
         <table><tr><td>
             <input id='slider' type='range' min='0' max='39' step='1' value='0' list='tickmarks' />
             <datalist id="tickmarks">
@@ -45,7 +51,7 @@
                 <option value="25" label="2020-02-12"> <option value="26"> <option value="27"> <option value="28"> <option value="29">
                 <option value="30" label="2020-02-17"> <option value="31"> <option value="32"> <option value="33"> <option value="34">
                 <option value="35" label="2020-02-22"> <option value="36"> <option value="37"> <option value="38"> <option value="39">
-                <option value="35" label="2020-02-27">
+                <option value="40" label="2020-02-27">
             </datalist>
         </td>
             <td>
@@ -68,74 +74,13 @@
 
 </div>
 <script>
-    function JSONObject(type,Date,People){
-        this.type=type;
-        this.Date=Date;
-        this.People=People;
-    }
-
-
-    function chartSet(index){
-        d3.csv("data.csv", function(CovData) {
-
-            var DataIndex = index-1;
-            console.log(CovData);
-            document.getElementById("charttitle").innerHTML = CovData[DataIndex].province; // The name of the city and country is inserted into the chart title
-            console.log(document.getElementById("chartContainer"))
-            var svg = dimple.newSvg("#chartContainer", 500, 250); // The chart is an svg variable assigned to the chartcontainer div. It's width and height are also assigned here
-            var chartdata =[]
-            for (var key in CovData[DataIndex]){
-                if (key.match(RegExp(/confirm/))){
-                    chartdata.push(new JSONObject("Confirm",key.replace("_confirm",""),CovData[DataIndex][key]))
-            }
-                else if (key.match(RegExp(/heal/))){
-                    chartdata.push(new JSONObject("Heal",key.replace("_heal",""),CovData[DataIndex][key]))
-                }
-
-                else if(key.match(RegExp(/dead/))){
-                    chartdata.push(new JSONObject("Death",key.replace("_dead",""),CovData[DataIndex][key]))
-                }
-            }
-
-            console.log(chartdata)
-            var myChart = new dimple.chart(svg, chartdata);
-            myChart.setBounds(60, 15, 390, 200);            // Set the chart bounds within the svg container
-
-            myChart.defaultColors = [
-                new dimple.color("#fc4e2a"),
-                new dimple.color("#31a354"),
-                new dimple.color("#3182bd")
-            ];
-
-            myChart.addLegend(100, 0, 380, 200, "right");
-
-            var x = myChart.addTimeAxis("x", "Date","%m-%d","%m-%d");  // Define the x axis. The latter statements define the date format which we want to be year only
-            x.timeInterval = 1;
-
-
-            var y = myChart.addMeasureAxis("y", "People"); // Define the y axis
-            y.ticks = 6;
-
-            var s = myChart.addSeries("type", dimple.plot.bar);
-            s.interpolation = "cardinal";
-
-            myChart.draw(1600);
-
-
-            svg.selectAll("path.dimple-proj").style("stroke", "2"); // Some minor stying changes using the svg selectAll statement. Make the projected data a dashed line and the grid colour lighter.
-            svg.selectAll("path.domain").style("stroke", "#CCC");
-            svg.selectAll("g.tick line").style("stroke", "#CCC");
-
-        })
-    }
-
     chartSet(35)
     mapboxgl.accessToken = 'pk.eyJ1IjoiY29ubm9yNjY2IiwiYSI6ImNrNWk1aDEwbDA4MWgzbW5wZGJocGpscW4ifQ.OixjWYY1xhduPq7A8swzPw'; // Put your Mapbox Public Access token here
 
     // Load a new map in the 'map' HTML div
     var map = new mapboxgl.Map({
         container: 'map', // container id
-        style: 'mapbox://styles/connor666/ck6ja1muh0wuz1imusid4ts9n', // style location
+        style: 'mapbox://styles/connor666/ck7g2to5v00qk1io4ma0w6q80', // style location
         center: [109.76,36.67], // starting position [lng, lat]
         zoom: 3.5 // start,ing zoom
     });
@@ -149,8 +94,9 @@
         collapsed:Boolean(true),
         clearAndBlurOnEsc:Boolean(true),
         clearOnBlur:Boolean(true),
-        types:'region,place'
+        types:'region,place',
     });
+
     document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
     document
         .getElementById('buttons')
@@ -185,11 +131,12 @@
                         currentLegend.childNodes[0].textContent=label.children[i+1].innerHTML
                     }
                 geocoder.setPlaceholder('查找省或城市名字')
+                document.getElementById('title').children[0].innerHTML='新型冠状病毒肺炎中国疫情(累计人数)分布图'
             }
             else {
-                label.children[1].innerHTML='Confirm';
-                label.children[3].innerHTML='Heal';
-                label.children[5].innerHTML='Death';
+                label.children[1].innerHTML='Confirmed';
+                label.children[3].innerHTML='Recovered';
+                label.children[5].innerHTML='Deaths';
                 document.getElementById("layerControl").children[0].innerHTML='Layer';
                 for (var i=0; i< label.children.length;i++)
                     if (label.children[i].checked==true){
@@ -197,10 +144,10 @@
                         currentLegend.childNodes[0].textContent=label.children[i+1].innerHTML
                     }
                 geocoder.setPlaceholder('Search for China provinces')
+                document.getElementById('title').children[0].innerHTML='COVID-19 in China by provinces (cases)'
             }
 
         });
-
 
     var dates=['2020-01-19',
         '2020-01-20','2020-01-21','2020-01-22','2020-01-23','2020-01-24','2020-01-25','2020-01-26','2020-01-27','2020-01-28','2020-01-29',
@@ -208,33 +155,26 @@
         '2020-02-09','2020-02-10','2020-02-11','2020-02-12','2020-02-13','2020-02-14','2020-02-15','2020-02-16','2020-02-17','2020-02-18',
         '2020-02-19','2020-02-20','2020-02-21','2020-02-22','2020-02-23','2020-02-24','2020-02-25','2020-02-26','2020-02-27'];
 
+    function setDate(date,layerName){
+        console.log(layerName)
+        document.getElementById('date').textContent = dates[date];
+        var pp = map.getPaintProperty('Province','fill-color');
+        //console.log(pp);
+        if (layerName=="Confirm"){
+            pp[1][1] = dates[date].replace('2020-','X').replace('-','_')+'_c';
+            map.setPaintProperty('Province','fill-color',pp);
+        }
+        else if (layerName=="Heal"){
+            pp[1][1] = dates[date].replace('2020-','X').replace('-','_')+'_h';
+            map.setPaintProperty('Province','fill-color',pp);
+        }
+        else {
+            pp[1][1] = dates[date].replace('2020-','X').replace('-','_')+'_d';
+            map.setPaintProperty('Province','fill-color',pp);
+        }
+    };
 
     map.on('load', function() {
-        function setDate(date,layerName){
-            console.log(layerName)
-            document.getElementById('date').textContent = dates[date];
-            var pp = map.getPaintProperty('Province','fill-color');
-            //console.log(pp);
-            if (layerName=="Confirm"){
-                pp[1][1] = dates[date].replace('2020-','X').replace('-','_')+'_c';
-                map.setPaintProperty('Province','fill-color',pp);
-            }
-            else if (layerName=="Heal"){
-                pp[1][1] = dates[date].replace('2020-','X').replace('-','_')+'_h';
-                map.setPaintProperty('Province','fill-color',pp);
-            }
-            else {
-                pp[1][1] = dates[date].replace('2020-','X').replace('-','_')+'_d';
-                map.setPaintProperty('Province','fill-color',pp);
-            }
-
-
-            //console.log(map.getPaintProperty('Province','fill-color'));
-
-            //var datecol = String(dates[date].replace('2020-','X').replace('-','_')+'_c');
-            //console.log(datecol);
-
-            };
 
         function setLegend(layers,colors) {
             for (i = 0; i < layers.length; i++) {
@@ -349,38 +289,21 @@
         });
 
 
-
         var mypopup = new mapboxgl.Popup({offset:[120,50],closeButton: false});
 
-/*
-        map.on('mouseover', 'Province', function (e) {
-            console.log(e)
-            mypopup
-                .setLngLat(e.lngLat)
-                .setHTML("<h3>" + e.features[0].properties.NAME + "</h3>2008: " + e.features[0].properties.NAME + "m<br />")
-                .addTo(map);
-        })
-*/
         document.getElementById('slider').addEventListener('input', function(e) {
             var date = parseInt(e.target.value);
-            setDate(date,"Confirm");
+            var label=document.getElementById("filters");
+            for (var i=0; i< label.children.length;i++)
+                if (label.children[i].checked==true){
+                    setDate(date,label.children[i].id);
+                }
         });
 
         document.getElementById('filters').addEventListener('change', function(e) {
             var layer=e.target.value;
             setLayer(layer)
-            document.getElementById('slider').addEventListener('input', function(e) {
-                var date = parseInt(e.target.value);
-                setDate(date,layer);
-            });
         });
-        //TODO : 优化slider 和 filters
-
-/*        document.getElementById('slider','filters').addEventListener('input', function(e) {
-            var date = parseInt(e.target.value);
-            setDate(date,layer);
-        });*/
-
 
         map.on('mouseenter', 'Province', function () {
             map.getCanvas().style.cursor = 'pointer';
@@ -403,12 +326,14 @@
                 //console.log(la[0].properties.NAME);
                 document.getElementById('laname').innerHTML = la[0].properties.NAME;
                 //console.log(la);
-                var confirm = map.getPaintProperty('Province','fill-color')[1][1].substr(0,7)+'c'
-                var heal=map.getPaintProperty('Province','fill-color')[1][1].substr(0,7)+'h'
-                var dead=map.getPaintProperty('Province','fill-color')[1][1].substr(0,7)+'d'
+                var confirm = map.getPaintProperty('Province','fill-color')[1][1].substr(0,7)+'c';
+                var heal=map.getPaintProperty('Province','fill-color')[1][1].substr(0,7)+'h';
+                var dead=map.getPaintProperty('Province','fill-color')[1][1].substr(0,7)+'d';
+                var label=document.getElementById("filters");
                 mypopup
                     .setLngLat(e.lngLat)
-                    .setHTML("<h3>" +la[0].properties.NAME+ "</h3>Confirm: " + la[0].properties[confirm]+ "<br />Heal: "+ la[0].properties[heal]+ "<br />Death: "+ la[0].properties[dead]+ "<br />")
+                    .setHTML("<h3>" +la[0].properties.NAME+ "</h3>" +label.children[1].innerHTML +": "+ la[0].properties[confirm]+ "<br />" +
+                        label.children[3].innerHTML+": "+ la[0].properties[heal]+ "<br />"+ label.children[5].innerHTML+": "+la[0].properties[dead]+ "<br />")
                     .addTo(map);
 
 
@@ -431,7 +356,6 @@
                 chartEle.children[2].remove();
                 chartSet(ID)
 
-
             } else{
                 var chartEle=document.getElementById("chartContainer");
                 chartEle.children[2].remove();
@@ -445,7 +369,6 @@
         setLegend(layers,colors)
 
     })
-
 
 </script>
 
