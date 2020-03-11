@@ -9,6 +9,7 @@
     <link href='cw_styles.css' rel='stylesheet' />
 </head>
 <body>
+<!--load mapbox and D3 JS-->
 <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.4.2/mapbox-gl-geocoder.min.js"></script>
 <script charset="utf-8" src="https://d3js.org/d3.v4.min.js"></script>
 <script charset="utf-8" src="https://cdnjs.cloudflare.com/ajax/libs/dimple/2.3.0/dimple.latest.min.js"></script>
@@ -19,6 +20,7 @@
         href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.4.2/mapbox-gl-geocoder.css"
         type="text/css"
 />
+<!--Creat some div-->
 <div id='map'></div>
 <div class="map-overlay" id="title"><h5>COVID-19 in China by provinces (cases)</h5></div>
 <div id="geocoder" class="geocoder"></div>
@@ -34,6 +36,7 @@
         <label for='Death'>Deaths</label>
     </div>
 </div>
+<!--Creat slider-->
 <div class='map-overlay' id="features">
     <div class='map-overlay-inner'>
         <h2 id="laname">Novel Coronavirus Daily</h2>
@@ -62,20 +65,20 @@
             Map Author: <a href="https://github.com/Connor666">Yu Fu</a> (CASA, University College London)</p>
     </div>
 </div>
+<!--Creat language transformation button-->
 <ul id="buttons">
     <li id="button-zh-Hans" class="button">中文</li>
     <li id="button-en" class="button">English</li>
 </ul>
-
+<!--Creat D3 chart container-->
 <div id="chartContainer">
-
     <p id="charttitle">Chart title is here</p>
     <p id="chartsubhead" style="font-size: 15px">Novel Coronavirus Daily</p>
 
 </div>
 <script>
-    chartSet(35)
-    mapboxgl.accessToken = 'pk.eyJ1IjoiY29ubm9yNjY2IiwiYSI6ImNrNWk1aDEwbDA4MWgzbW5wZGJocGpscW4ifQ.OixjWYY1xhduPq7A8swzPw'; // Put your Mapbox Public Access token here
+    chartSet(35); // The initial chart is total China whose ID is 35 (The last row)
+    mapboxgl.accessToken = 'pk.eyJ1IjoiY29ubm9yNjY2IiwiYSI6ImNrNWk1aDEwbDA4MWgzbW5wZGJocGpscW4ifQ.OixjWYY1xhduPq7A8swzPw'; // Mapbox Public Access token here
 
     // Load a new map in the 'map' HTML div
     var map = new mapboxgl.Map({
@@ -85,7 +88,7 @@
         zoom: 3.5 // start,ing zoom
     });
 
-    var geocoder = new MapboxGeocoder({
+    var geocoder = new MapboxGeocoder({ // load a Geocoder
         accessToken: mapboxgl.accessToken,
         mapboxgl: mapboxgl,
         countries:'CN,HK,MO,TW',
@@ -96,12 +99,14 @@
         clearOnBlur:Boolean(true),
         types:'region,place',
     });
-
+    // add Geocoder to map
     document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
+    // Language settings
     document
         .getElementById('buttons')
         .addEventListener('click', function(event) {
             var language = event.target.id.substr('button-'.length);
+            // change the background map language
             map.setLayoutProperty('country-label', 'text-field', [
                 'get',
                 'name_' + language
@@ -120,27 +125,25 @@
             ]);
             var label=document.getElementById("filters");
             var currentLegend=document.getElementById('legend');
-            if (language=="zh-Hans"){
+            if (language=="zh-Hans"){// change the layer control language
                 label.children[1].innerHTML='确诊';
                 label.children[3].innerHTML='康复';
                 label.children[5].innerHTML='死亡';
                 document.getElementById("layerControl").children[0].innerHTML='图例';
                 for (var i=0; i< label.children.length;i++)
-                    if (label.children[i].checked==true){
-                        console.log(label.children[i+1].innerHTML);
+                    if (label.children[i].checked==true){// change the legend language
                         currentLegend.childNodes[0].textContent=label.children[i+1].innerHTML
                     }
-                geocoder.setPlaceholder('查找省或城市名字')
-                document.getElementById('title').children[0].innerHTML='新型冠状病毒肺炎中国疫情(累计人数)分布图'
+                geocoder.setPlaceholder('查找省或城市名字');// change the Geocoder language
+                document.getElementById('title').children[0].innerHTML='新型冠状病毒肺炎中国疫情(累计人数)分布图'// change title language
             }
-            else {
+            else {// similar to the above
                 label.children[1].innerHTML='Confirmed';
                 label.children[3].innerHTML='Recovered';
                 label.children[5].innerHTML='Deaths';
                 document.getElementById("layerControl").children[0].innerHTML='Layer';
                 for (var i=0; i< label.children.length;i++)
                     if (label.children[i].checked==true){
-                        console.log(label.children[i+1].innerHTML);
                         currentLegend.childNodes[0].textContent=label.children[i+1].innerHTML
                     }
                 geocoder.setPlaceholder('Search for China provinces')
@@ -155,11 +158,10 @@
         '2020-02-09','2020-02-10','2020-02-11','2020-02-12','2020-02-13','2020-02-14','2020-02-15','2020-02-16','2020-02-17','2020-02-18',
         '2020-02-19','2020-02-20','2020-02-21','2020-02-22','2020-02-23','2020-02-24','2020-02-25','2020-02-26','2020-02-27'];
 
-    function setDate(date,layerName){
+    function setDate(date,layerName){// the function is to change the date and the fill color data in the slider box
         console.log(layerName)
         document.getElementById('date').textContent = dates[date];
         var pp = map.getPaintProperty('Province','fill-color');
-        //console.log(pp);
         if (layerName=="Confirm"){
             pp[1][1] = dates[date].replace('2020-','X').replace('-','_')+'_c';
             map.setPaintProperty('Province','fill-color',pp);
@@ -176,7 +178,7 @@
 
     map.on('load', function() {
 
-        function setLegend(layers,colors) {
+        function setLegend(layers,colors) {// Function to set legend
             for (i = 0; i < layers.length; i++) {
                 var layer = layers[i];
                 var color = colors[i];
@@ -194,18 +196,18 @@
 
         }
 
-        function removeLayer(elem) {
+        function removeLayer(elem) {// function to remove layer
             var number=elem.childElementCount;
             for (i=0;i<number-1;i++){
                 elem.children[1].remove()
             }
         }
-        function setLayer(layer) {
+        function setLayer(layer) { // function to set layer (legend and color)
             var pp = map.getPaintProperty('Province','fill-color');
             console.log(pp)
             if (layer=="Confirm"){
-                pp[1][1] = pp[1][1].substr(0,7)+'c';
-                [pp[2],pp[3],pp[4],pp[5],pp[6],pp[7],pp[8],pp[9],pp[10],pp[11],pp[12]] = ["#ffeda0",10,"#fed976",100,"#feb24c",500,"#fc4e2a",1000,"#e31a1c",10000,"#bd0026"];
+                pp[1][1] = pp[1][1].substr(0,7)+'c';// the seventh letter is the layer name (c means confirmed)
+                [pp[2],pp[3],pp[4],pp[5],pp[6],pp[7],pp[8],pp[9],pp[10],pp[11],pp[12]] = ["#ffeda0",10,"#fed976",100,"#feb24c",500,"#fc4e2a",1000,"#e31a1c",10000,"#bd0026"];// set the color boundary
                 map.setPaintProperty('Province','fill-color',pp);
                 var currentLegend=document.getElementById('legend');
                 var currentLayer=document.getElementById('filters');
@@ -234,7 +236,7 @@
                 map.setPaintProperty('Province','fill-color',pp);
             }
         };
-        map.addLayer({
+        map.addLayer({// control the filled color layer
             id: 'Province',
             type: 'fill',
             source: {
@@ -252,7 +254,7 @@
             },
         });
 
-        map.addLayer({
+        map.addLayer({// creat a boundary line
             id:'boundary',
             type:'line',
             source: {
@@ -270,7 +272,7 @@
             },
         })
 
-        map.addLayer({
+        map.addLayer({// control the hover layer
             id: 'lahighlight',
             type: 'line',
             source: {
@@ -289,9 +291,9 @@
         });
 
 
-        var mypopup = new mapboxgl.Popup({offset:[120,50],closeButton: false});
+        var mypopup = new mapboxgl.Popup({offset:[120,50],closeButton: false});// Creat pop up
 
-        document.getElementById('slider').addEventListener('input', function(e) {
+        document.getElementById('slider').addEventListener('input', function(e) {// Control the slider
             var date = parseInt(e.target.value);
             var label=document.getElementById("filters");
             for (var i=0; i< label.children.length;i++)
@@ -300,7 +302,7 @@
                 }
         });
 
-        document.getElementById('filters').addEventListener('change', function(e) {
+        document.getElementById('filters').addEventListener('change', function(e) {// control the layer
             var layer=e.target.value;
             setLayer(layer)
         });
@@ -315,17 +317,15 @@
             mypopup.remove();
         });
 
-        map.on('mousemove', function(e) {
+        map.on('mousemove', function(e) {// creat the pop up once the mouse move
             var la = map.queryRenderedFeatures(e.point, {
                 layers: ['Province']
             });
 
-            if (la.length==1) {
+            if (la.length==1) {// if the mouse is inside the Geo polygon , there will a hover and pop up
 
                 map.setFilter('lahighlight', ['==','NAME',la[0].properties.NAME]);
-                //console.log(la[0].properties.NAME);
                 document.getElementById('laname').innerHTML = la[0].properties.NAME;
-                //console.log(la);
                 var confirm = map.getPaintProperty('Province','fill-color')[1][1].substr(0,7)+'c';
                 var heal=map.getPaintProperty('Province','fill-color')[1][1].substr(0,7)+'h';
                 var dead=map.getPaintProperty('Province','fill-color')[1][1].substr(0,7)+'d';
@@ -337,7 +337,7 @@
                     .addTo(map);
 
 
-            } else {
+            } else {// there will be no hover is not inside the polygon
                 map.setFilter('lahighlight', ['==','NAME','null']);
                 console.log('No features');
                 document.getElementById('laname').innerHTML = "Novel Coronavirus Daily";
@@ -345,25 +345,25 @@
 
         });
 
-        map.on('click', function (e) {
+        map.on('click', function (e) {// event to creat D3 chart one the polygon is clicked
             var la = map.queryRenderedFeatures(e.point, {
                 layers: ['Province']
             });
-            if (la.length==1){
+
+            if (la.length==1){// the D3 chart will be created if clicked
                 var ID=la[0].id;
                 var chartEle=document.getElementById("chartContainer");
-
                 chartEle.children[2].remove();
                 chartSet(ID)
 
-            } else{
+            } else{// the D3 chart will be total China chart if clicked outside of China
                 var chartEle=document.getElementById("chartContainer");
                 chartEle.children[2].remove();
                 chartSet(35);
             }
 
         });
-
+        // Creat some initial legend
         var layers = ['0-10', '10-100','100-500', '500-1000', '1000-10000', '10000+'];
         var colors = ["#ffeda0","#fed976","#feb24c","#fc4e2a","#e31a1c","#bd0026"];
         setLegend(layers,colors)
@@ -371,6 +371,5 @@
     })
 
 </script>
-
 </body>
 </html>
