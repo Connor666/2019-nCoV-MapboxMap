@@ -15,11 +15,11 @@ function chartSet(index) { // Function to generate D3 chart
         var chartdata = [];
         for (var key in CovData[DataIndex]) {  // Data into different group according to the type
             if (key.match(RegExp(/confirm/))) {
-                chartdata.push(new JSONObject("Confirmed", key.replace("_confirm", ""), CovData[DataIndex][key]))
+                chartdata.push(new JSONObject("Confirmed", ("2020-"+key.replace("_confirm", "")), CovData[DataIndex][key]))
             } else if (key.match(RegExp(/heal/))) {
-                chartdata.push(new JSONObject("Recovered", key.replace("_heal", ""), CovData[DataIndex][key]))
+                chartdata.push(new JSONObject("Recovered", ("2020-"+key.replace("_heal", "")), CovData[DataIndex][key]))
             } else if (key.match(RegExp(/dead/))) {
-                chartdata.push(new JSONObject("Deaths", key.replace("_dead", ""), CovData[DataIndex][key]))
+                chartdata.push(new JSONObject("Deaths", ("2020-"+key.replace("_dead", "")), CovData[DataIndex][key]))
             }
         }
 
@@ -34,7 +34,7 @@ function chartSet(index) { // Function to generate D3 chart
 
         myChart.addLegend(100, 0, 380, 200, "right");
 
-        var x = myChart.addTimeAxis("x", "Date", "%m-%d", "%m-%d");  // Define the x axis and the format
+        var x = myChart.addTimeAxis("x", "Date", "%Y-%m-%d", "%m-%d");  // Define the x axis and the format
         x.timeInterval = 1;
 
 

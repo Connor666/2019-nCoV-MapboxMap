@@ -44,7 +44,7 @@
         <div><button class="play" onclick="autoPlay()" id="autoPlay"></button></div>
         <div><button class="triangle-up" onclick="addDate()"></button></div>
         <table><tr><td>
-            <input id='slider' type='range' min='0' max='39' step='1' value='0' list='tickmarks' />
+            <input id='slider' type='range' min='0' max='52' step='1' value='0' list='tickmarks' />
             <datalist id="tickmarks">
                 <option value="0" label="2020-01-19"> <option value="1"> <option value="2"> <option value="3"> <option value="4">
                 <option value="5" label="2020-01-24"> <option value="6"> <option value="7"> <option value="8"> <option value="9">
@@ -54,7 +54,9 @@
                 <option value="25" label="2020-02-12"> <option value="26"> <option value="27"> <option value="28"> <option value="29">
                 <option value="30" label="2020-02-17"> <option value="31"> <option value="32"> <option value="33"> <option value="34">
                 <option value="35" label="2020-02-22"> <option value="36"> <option value="37"> <option value="38"> <option value="39">
-                <option value="40" label="2020-02-27">
+                <option value="40" label="2020-02-27"> <option value="41"> <option value="42"> <option value="43"> <option value="44">
+                <option value="45" label="2020-03-03"> <option value="46"> <option value="47"> <option value="48"> <option value="49">
+                <option value="50" label="2020-03-08"> <option value="51"> <option value="52"> <option value="53">
             </datalist>
         </td>
             <td>
@@ -156,7 +158,9 @@
         '2020-01-20','2020-01-21','2020-01-22','2020-01-23','2020-01-24','2020-01-25','2020-01-26','2020-01-27','2020-01-28','2020-01-29',
         '2020-01-30','2020-01-31','2020-02-01','2020-02-02','2020-02-03','2020-02-04','2020-02-05','2020-02-06','2020-02-07','2020-02-08',
         '2020-02-09','2020-02-10','2020-02-11','2020-02-12','2020-02-13','2020-02-14','2020-02-15','2020-02-16','2020-02-17','2020-02-18',
-        '2020-02-19','2020-02-20','2020-02-21','2020-02-22','2020-02-23','2020-02-24','2020-02-25','2020-02-26','2020-02-27'];
+        '2020-02-19','2020-02-20','2020-02-21','2020-02-22','2020-02-23','2020-02-24','2020-02-25','2020-02-26','2020-02-27','2020-02-28',
+        '2020-02-29','2020-03-01','2020-03-02','2020-03-03','2020-03-04','2020-03-05','2020-03-06','2020-03-07','2020-03-08','2020-03-09',
+        '2020-03-10','2020-03-11'];
 
     function setDate(date,layerName){// the function is to change the date and the fill color data in the slider box
         console.log(layerName)
@@ -241,9 +245,9 @@
             type: 'fill',
             source: {
                 type: 'vector',
-                url: 'mapbox://connor666.a0mivq19' // Your Mapbox tileset Map ID
+                url: 'mapbox://connor666.5f9xq0d5' // Your Mapbox tileset Map ID
             },
-            'source-layer': 'datamap2-9vmgj2', // name of tilesets
+            'source-layer': 'datamap-2hm061', // name of tilesets
             'layout': {
                 'visibility': 'visible'
             },
@@ -259,9 +263,9 @@
             type:'line',
             source: {
                 type: 'vector',
-                url: 'mapbox://connor666.a0mivq19' // Your Mapbox tileset Map ID
+                url: 'mapbox://connor666.5f9xq0d5' // Your Mapbox tileset Map ID
             },
-            'source-layer': 'datamap2-9vmgj2', // name of tilesets
+            'source-layer': 'datamap-2hm061', // name of tilesets
             'layout': {
                 'visibility': 'visible'
             },
@@ -277,9 +281,9 @@
             type: 'line',
             source: {
                 type: 'vector',
-                url: 'mapbox://connor666.a0mivq19' // Your Mapbox tileset Map ID
+                url: 'mapbox://connor666.5f9xq0d5' // Your Mapbox tileset Map ID
             },
-            'source-layer': 'datamap2-9vmgj2', // name of tilesets
+            'source-layer': 'datamap-2hm061', // name of tilesets
             'layout': {
                 'visibility': 'visible'
             },
